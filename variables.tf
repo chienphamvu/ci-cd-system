@@ -10,12 +10,10 @@ variable "aws_secret_key" {
 
 variable "aws_internet_gateway_id" {
   description = "AWS Internet Gateway ID"
+  default = "igw-07cd6b0e37ee28309"
 }
 
 variable "aws_vpc_id" {
   description = "AWS VPC ID"
-}
-
-variable "aws_private_subnet_id" {
-  description = "AWS private subnet ID"
+  default = "vpc-02969966021438af7"
 }
