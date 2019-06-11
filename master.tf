@@ -6,6 +6,10 @@ provider "aws" {
   version = "~> 2.0"
 }
 
+#######################
+# NETWORK
+#######################
+
 resource "aws_subnet" "myvpc-public-subnet" {
   vpc_id = "${var.aws_vpc_id}"
   cidr_block = "10.0.1.0/24"
@@ -21,40 +25,51 @@ resource "aws_security_group" "allow_ssh" {
   ingress {
     from_port   = 22
     to_port     = 22
-    protocol    = "ssh"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8
+    to_port   = 0
+    protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_key_pair" "admin" {
-  key_name = "private-key"
+#######################
+# INSTANCE
+#######################
 
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDd98QYvKr7toHasiMJA1TOSCiQ75YcncMLnYkG+FTgRPcmSHZAq8499X7PAvi1CPiYYlNDY8qKpn8AqojDmaTU6jJU8QTolE6HsCDzZoohp781KETsb+EBtp2Ba1UHPAXPD1Uotg8lhfCyk3fgwYZO4hhOS82MXX/AoXV/frGFciI9WYEG9WjN01GhX8yJvRoLCxyke6es7eHV8bWUlGU68cOH+xyGUkt++rNmnxn0YZeUbDTEQChYdnH91OovRdHdXf+pXW2ZHwKiy1h0fSKc8vFzSQmiCOVHhBlZAX+xlRntUWTrCEvNtkMBeF+Wr6Td83EFAjkH8h2HMThQtDib pvchien@pvchien-comp"
-}
+# resource "aws_key_pair" "admin" {
+#   key_name = "public-key"
 
-resource "aws_instance" "master" {
-  ami                     = "ami-0da0dfdf36db6e7e1"
-  instance_type           = "t2.micro"
-  vpc_security_group_ids  = ["${aws_security_group.allow_ssh.id}"]
-  subnet_id               = "${aws_subnet.myvpc-public-subnet.id}"
-  key_name                = "${aws_key_pair.admin.id}"
+#   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDd98QYvKr7toHasiMJA1TOSCiQ75YcncMLnYkG+FTgRPcmSHZAq8499X7PAvi1CPiYYlNDY8qKpn8AqojDmaTU6jJU8QTolE6HsCDzZoohp781KETsb+EBtp2Ba1UHPAXPD1Uotg8lhfCyk3fgwYZO4hhOS82MXX/AoXV/frGFciI9WYEG9WjN01GhX8yJvRoLCxyke6es7eHV8bWUlGU68cOH+xyGUkt++rNmnxn0YZeUbDTEQChYdnH91OovRdHdXf+pXW2ZHwKiy1h0fSKc8vFzSQmiCOVHhBlZAX+xlRntUWTrCEvNtkMBeF+Wr6Td83EFAjkH8h2HMThQtDib pvchien@pvchien-comp"
+# }
 
-  tags = {
-    Name = "Master node"
-  }
-}
+# resource "aws_instance" "master" {
+#   ami                     = "ami-0da0dfdf36db6e7e1"
+#   instance_type           = "t2.micro"
+#   vpc_security_group_ids  = ["${aws_security_group.allow_ssh.id}"]
+#   subnet_id               = "${aws_subnet.myvpc-public-subnet.id}"
+#   key_name                = "${aws_key_pair.admin.id}"
 
-resource "aws_ebs_volume" "data" {
-  availability_zone = "ap-southeast-1a"
-  size              = 3
+#   tags = {
+#     Name = "Master node"
+#   }
+# }
 
-  tags = {
-    Name = "HelloWorld"
-  }
-}
+# resource "aws_ebs_volume" "data" {
+#   availability_zone = "ap-southeast-1a"
+#   size              = 2
 
-resource "aws_volume_attachment" "ebs_att" {
-  device_name = "/dev/sdh"
-  volume_id   = "${aws_ebs_volume.data.id}"
-  instance_id = "${aws_instance.master.id}"
-}
+#   tags = {
+#     Name = "HelloWorld"
+#   }
+# }
+
+# resource "aws_volume_attachment" "ebs_att" {
+#   device_name = "/dev/sdh"
+#   volume_id   = "${aws_ebs_volume.data.id}"
+#   instance_id = "${aws_instance.master.id}"
+# }
