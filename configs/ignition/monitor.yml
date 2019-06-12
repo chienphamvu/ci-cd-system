@@ -1,0 +1,17 @@
+systemd:
+  units:
+    - name: sensu.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Jenkins master
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/docker run \
+                                     --name %p \
+                                     -p 8080:8080 \
+                                     -p 50000:50000 \
+                                     jenkins/jenkins
+        [Install]
+        WantedBy=multi-user.target
