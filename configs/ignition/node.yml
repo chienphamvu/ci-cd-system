@@ -1,0 +1,29 @@
+locksmith:
+  reboot_strategy: "off"
+systemd:
+  units:
+    - name: jenkins-slave.service
+      enable: true
+      contents: |
+        [Unit]
+        Description=Jenkins slave
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        ExecStartPre=-/usr/bin/docker pull chienphamvu/jenkins-slave
+        ExecStart=/usr/bin/docker run \
+                                     --rm \
+                                     --name %p \
+                                     -p 50000:50000 \
+                                     --net host \
+                                     chienphamvu/jenkins-slave \
+                                     -master "http://10.0.1.20:8080" \
+                                     -labels "slave" \
+                                     -executors "2" \
+                                     -username admin \
+                                     -password admin
+        ExecStop=/usr/bin/docker kill %p
+
+        [Install]
+        WantedBy=multi-user.target

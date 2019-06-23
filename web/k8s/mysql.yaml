@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql # This has to match labels of template below
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql # This has to match matchLabels above
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7.26
+        # resources:
+          # requests:
+            # cpu: 100m
+            # memory: 100Mi
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: root
+        ports:
+        - containerPort: 3306
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  labels:
+    app: mysql-service
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql
+  ports:
+  - port: 3306 # pod
+    targetPort: 3306 # container: actual port
+

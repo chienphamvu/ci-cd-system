@@ -9,69 +9,93 @@ storage:
         id: 500
       group:
         id: 501
+locksmith:
+  reboot_strategy: "off"
 systemd:
   units:
+    - name: storage-mount.service
+      contents: |
+        [Unit]
+        Description=Mount storage disk
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStartPre=/usr/bin/mkdir -p /storage
+        ExecStart=/usr/bin/mount /dev/xvdh1 /storage
+        ExecStop=/usr/bin/umount /storage
+
     - name: jenkins.service
-      enabled: true
+      enable: true
       contents: |
         [Unit]
         Description=Jenkins master
+        After=docker.service storage-mount.service
+        Requires=docker.service storage-mount.service
 
         [Service]
-        Type=oneshot
+        ExecStartPre=-/usr/bin/docker pull chienphamvu/jenkins
         ExecStart=/usr/bin/docker run \
+                                     --rm \
                                      --name %p \
                                      -p 8080:8080 \
                                      -p 50000:50000 \
-                                     jenkins/jenkins
-        [Install]
-        WantedBy=multi-user.target
-    - name: gerrit.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Gerrit master
-
-        [Service]
-        Type=oneshot
-        ExecStart=/usr/bin/docker run \
-                                     --name %p \
-                                     -p 29418:29418 \
-                                     -p 8081:8080 \
-                                     -e CANONICAL_WEB_URL=http://localhost \
-                                     gerritcodereview/gerrit
+                                     -v /storage/jenkins_data:/var/jenkins_home \
+                                     chienphamvu/jenkins
+        ExecStop=/usr/bin/docker kill %p
+        Restart=always
+        RestartSec=10s
+        TimeoutStartSec=0
+        TimeoutStopSec=15
 
         [Install]
         WantedBy=multi-user.target
-    - name: ldap.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Ldap
+    # - name: gerrit.service
+    #   enabled: true
+    #   contents: |
+    #     [Unit]
+    #     Description=Gerrit master
 
-        [Service]
-        Type=oneshot
-        ExecStart=/usr/bin/docker run \
-                                     --name %p \
-                                     -p 389:389 \
-                                     -p 636:636 \
-                                     -e LDAP_ADMIN_PASSWORD=admin \
-                                     osixia/openldap
-        [Install]
-        WantedBy=multi-user.target
-    - name: ldap-admin.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Ldap Admin
+    #     [Service]
+    #     Type=oneshot
+    #     ExecStart=/usr/bin/docker run \
+    #                                  --name %p \
+    #                                  -p 29418:29418 \
+    #                                  -p 8081:8080 \
+    #                                  -e CANONICAL_WEB_URL=http://localhost \
+    #                                  gerritcodereview/gerrit
 
-        [Service]
-        Type=oneshot
-        ExecStart=/usr/bin/docker run \
-                                     --name %p \
-                                     -p 6443:443 \
-                                     -e PHPLDAPADMIN_LDAP_HOSTS=ldap \
-                                     osixia/phpldapadmin
+    #     [Install]
+    #     WantedBy=multi-user.target
+    # - name: ldap.service
+    #   enabled: true
+    #   contents: |
+    #     [Unit]
+    #     Description=Ldap
 
-        [Install]
-        WantedBy=multi-user.target
+    #     [Service]
+    #     Type=oneshot
+    #     ExecStart=/usr/bin/docker run \
+    #                                  --name %p \
+    #                                  -p 389:389 \
+    #                                  -p 636:636 \
+    #                                  -e LDAP_ADMIN_PASSWORD=admin \
+    #                                  osixia/openldap
+    #     [Install]
+    #     WantedBy=multi-user.target
+    # - name: ldap-admin.service
+    #   enabled: true
+    #   contents: |
+    #     [Unit]
+    #     Description=Ldap Admin
+
+    #     [Service]
+    #     Type=oneshot
+    #     ExecStart=/usr/bin/docker run \
+    #                                  --name %p \
+    #                                  -p 6443:443 \
+    #                                  -e PHPLDAPADMIN_LDAP_HOSTS=ldap \
+    #                                  osixia/phpldapadmin
+
+    #     [Install]
+    #     WantedBy=multi-user.target

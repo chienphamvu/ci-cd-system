@@ -1,0 +1,8 @@
+- job:
+    name: 'Farm-Scale'
+    parameters:
+        - string:
+            name: TARGET_NB_NODES
+    builders:
+        - shell:
+            !include-raw: farm-scale.sh
