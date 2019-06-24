@@ -41,7 +41,7 @@ systemd:
                                      -p 8080:8080 \
                                      -p 50000:50000 \
                                      -v /storage/jenkins_data:/var/jenkins_home \
-                                     chienphamvu/jenkins
+                                     chienphamvu/jenkins-master
         ExecStop=/usr/bin/docker kill %p
         Restart=always
         RestartSec=10s
