@@ -6,6 +6,14 @@ provider "aws" {
   version = "~> 2.0"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "chienpham-terraform-states"
+    key    = "aws-master-terraform-states"
+    region = "ap-southeast-1"
+  }
+}
+
 #######################
 # NETWORK
 #######################

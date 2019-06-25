@@ -22,3 +22,8 @@ variable "aws_public_subnet" {
   description = "AWS public subnet"
   default     = "subnet-056dcf0ded5890bc3"
 }
+
+variable "node_count" {
+  description = "Number of node to create"
+  default     = 1
+}

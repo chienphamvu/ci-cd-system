@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "chienpham-terraform-states"
+    key    = "aws-node-terraform-states"
+    region = "ap-southeast-1"
+  }
+}
+
 provider "aws" {
   region     = "ap-southeast-1"
   access_key = "${var.aws_access_key}"
@@ -34,6 +42,7 @@ resource "aws_security_group" "node_sc" {
 }
 
 resource "aws_instance" "node" {
+  count                   ="${var.node_count}"
   ami                     = "ami-0da0dfdf36db6e7e1"
   instance_type           = "t2.micro"
   vpc_security_group_ids  = ["${aws_security_group.node_sc.id}"]
