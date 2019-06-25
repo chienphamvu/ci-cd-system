@@ -13,25 +13,26 @@ locksmith:
   reboot_strategy: "off"
 systemd:
   units:
-    - name: storage-mount.service
+    - name: storage.mount
       contents: |
         [Unit]
         Description=Mount storage disk
+        Before=docker.service
 
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        ExecStartPre=/usr/bin/mkdir -p /storage
-        ExecStart=/usr/bin/mount /dev/xvdh1 /storage
-        ExecStop=/usr/bin/umount /storage
+        [Mount]
+        What=/dev/xvdh1
+        Where=/storage
+
+        [Install]
+        WantedBy=docker.service
 
     - name: jenkins.service
       enable: true
       contents: |
         [Unit]
         Description=Jenkins master
-        After=docker.service storage-mount.service
-        Requires=docker.service storage-mount.service
+        After=docker.service storage.mount
+        Requires=docker.service storage.mount
 
         [Service]
         ExecStartPre=-/usr/bin/docker pull chienphamvu/jenkins

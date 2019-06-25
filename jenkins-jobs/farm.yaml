@@ -1,8 +1,52 @@
+- scm:
+    name: web-app-k8s
+    scm:
+        - git:
+            credentials-id: github
+            url: https://github.com/chienphamvu/web-app-k8s
+            branches:
+                - origin/master
+
 - job:
     name: 'Farm-Scale'
+    node: master
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: jenkins
+                username: JENKINS_USR
+                password: JENKINS_PWD
+            - username-password-separated:
+                credential-id: aws-access-key
+                username: AWS_ACCESS_KEY
+                password: AWS_SECRET_KEY
     parameters:
         - string:
             name: TARGET_NB_NODES
     builders:
         - shell:
             !include-raw: farm-scale.sh
+    publishers:
+        - workspace-cleanup
+
+- job:
+    name: 'K8S-Deploy'
+    node: slave
+    scm:
+        - web-app-k8s
+    triggers:
+        - github
+    wrappers:
+        - credentials-binding:
+            - file:
+                credential-id:  gcloud-k8s-service-account
+                variable: K8S_SERVICE_ACCOUNT_FILE
+    parameters:
+        - bool:
+            name: GCLOUD_FORCE_UPDATE
+            default: false
+    builders:
+        - shell:
+            !include-raw: deploy.sh
+    publishers:
+        - workspace-cleanup

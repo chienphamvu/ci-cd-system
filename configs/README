@@ -1,5 +1,7 @@
-.json files are generated from .yml files using ct command
+.json files in "ignition" dir are generated from .yml files using ct command:
 
 ct -in-file /path/to/yml-file.yml -platform ec2 -out-file /path/to/json-file.json
+
+To generate all .yml files into ignition folder, use ignition-transpile.sh script
 
 For more information about the tool, visit https://github.com/coreos/container-linux-config-transpiler

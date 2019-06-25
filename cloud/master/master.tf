@@ -69,19 +69,11 @@ resource "aws_instance" "master" {
   }
 }
 
-# resource "aws_ebs_volume" "data" {
-#   availability_zone = "ap-southeast-1a"
-#   size              = 2
-
-#   tags = {
-#     Name = "HelloDisk"
-#   }
-# }
-
 resource "aws_volume_attachment" "ebs_att" {
   device_name = "/dev/xvdh"
   volume_id   = "${var.aws_ebs_volume}"
   instance_id = "${aws_instance.master.id}"
+  skip_destroy = true
 }
 
 ########################
