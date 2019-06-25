@@ -20,6 +20,8 @@
                 credential-id: aws-access-key
                 username: AWS_ACCESS_KEY
                 password: AWS_SECRET_KEY
+    # triggers:
+    #     - timed: '*/4 * * * *'
     parameters:
         - string:
             name: TARGET_NB_NODES
