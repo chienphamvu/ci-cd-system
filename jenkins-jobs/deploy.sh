@@ -36,4 +36,7 @@ gcloud container clusters get-credentials $GCLOUD_K8S_CLUSTER_NAME
 
 # Deploy to K8S
 kubectl apply -f k8s
-kubectl set image deployments/php-apache server=${DOCKER_IMAGE}:${GIT_SHA}
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+
+kubectl set image deployments/php-apache php-apache=${DOCKER_IMAGE}:${GIT_SHA}
