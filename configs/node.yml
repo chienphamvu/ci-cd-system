@@ -15,8 +15,11 @@ systemd:
         ExecStart=/usr/bin/docker run \
                                      --rm \
                                      --name %p \
+                                     -u root \
                                      -p 50000:50000 \
                                      --net host \
+                                     -v /var/run/docker.sock:/var/run/docker.sock \
+                                     -v /usr/bin/docker:/usr/bin/docker \
                                      chienphamvu/jenkins-slave \
                                      -master "http://10.0.1.20:8080" \
                                      -labels "slave" \

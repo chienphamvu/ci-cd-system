@@ -43,7 +43,19 @@
             - file:
                 credential-id:  gcloud-k8s-service-account
                 variable: K8S_SERVICE_ACCOUNT_FILE
+            - username-password-separated:
+                credential-id: dockerhub
+                username: DOCKER_USR
+                password: DOCKER_PWD
     parameters:
+        - string:
+            name: GCLOUD_PROJECT_ID
+        - string:
+            name: GCLOUD_COMPUTE_ZONE
+        - string:
+            name: GCLOUD_K8S_CLUSTER_NAME
+        - string:
+            name: GCLOUD_SDK_VERSION
         - bool:
             name: GCLOUD_FORCE_UPDATE
             default: false
